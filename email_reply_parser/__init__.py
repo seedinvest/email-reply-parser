@@ -45,7 +45,9 @@ class EmailMessage(object):
     # so we can get a better reply parsed
     # not sure why this is called multi_quote_header 
     MULTI_QUOTE_HEADER_REGEX = r'(?!On.*On\s.+?wrote:)(On\s(.+?)wrote:)'  
+    ORIGINAL_MESSAGE_HEADER_REGEX = r'-+ (Original message) -+'
 
+    
     def __init__(self, text):
         self.fragments = []
         self.fragment = None
@@ -98,7 +100,9 @@ class EmailMessage(object):
 
         is_quoted = re.match(self.QUOTED_REGEX, line) is not None
         is_header = (re.match(self.HEADER_REGEX, line) is not None or 
-                re.match(self.MULTI_QUOTE_HEADER_REGEX, line) is not None)
+                re.match(self.MULTI_QUOTE_HEADER_REGEX, line) is not None or
+                re.match(self.ORIGINAL_MESSAGE_HEADER_REGEX, line, flags=re.IGNORECASE | re.DOTALL) is not None
+                )
 
         if self.fragment and len(line.strip()) == 0:
             if re.match(self.SIG_REGEX, self.fragment.lines[-1]):
